@@ -1,8 +1,11 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
+import { Chewy } from 'next/font/google'
 
-const inter = Inter({ subsets: ['latin'] })
-
+const chewy = Chewy({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+})
 export const metadata = {
   title: 'GeoBook',
   description: 'Discuss The Fun of Traveling',
@@ -11,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={chewy.className}>{children}</body>
     </html>
   )
 }
