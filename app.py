@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
-from bcrypt import checkpw
+from flask_bcrypt import Bcrypt
+import bcrypt
 
 app = Flask(__name__)
 
@@ -14,16 +15,20 @@ def login():
     username = request.json.get('username')
     password = request.json.get('password')
     if username and password:
+
         user = users_collection.find_one({'username': username})
-        print(user['password'])
+
         if user:
-            # Compare the provided password with the stored password hash
-            if checkpw(password.encode('utf-8'), user['password'].encode("utf-8")):
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), user['password'].encode('utf-8'))
+
+            if hashed_password == user['password'].encode('utf-8'):
                 return jsonify({'message': 'Login successful'})
             else:
                 return jsonify({'message': 'Invalid password'})
+            
         else:
             return jsonify({'message': 'User not found'})
+
     else:
         return jsonify({'message': 'Username and Password are required'})
 
