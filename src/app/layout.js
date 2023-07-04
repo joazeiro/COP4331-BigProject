@@ -8,7 +8,7 @@ const chewy = Chewy({
 })
 export const metadata = {
   title: 'GeoBook',
-  description: 'Discuss The Fun of Traveling',
+  description: 'Discuss The Fun of Traveling'
 }
 
 export default function RootLayout({ children }) {

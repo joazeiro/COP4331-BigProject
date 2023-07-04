@@ -12,33 +12,79 @@ const RegisterForm = () => {
 }
   return (
     <div>
-        <form className = "bg-secondary py-12 px-4 space-y-4 rounded-xl" onSubmit={handleSubmit}>
+        <form className = "bg-secondary py-10 px-4 space-y-4 rounded-xl" onSubmit={handleSubmit}>
             <div className = "text-center text-fourth text-3xl ">Sign Up</div>
-            <div className="rounded-md shadow-sm -space-y-px text-fourth text-xl">Email
+            <div className="rounded-md shadow-sm -space-y-px text-fourth text-xl">
                 <div>
-                    <label htmlFor="email-address" className="sr-only">Email address</label>
-                    <input id="email-address" name="email" type="email" required
-                            className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
+                    <label htmlFor="first-name">First Name</label>
+                    <input 
+                        id="first_name" 
+                        name="first_name" 
+                        type="text" 
+                        required 
+                        className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
                     />
                 </div>
-                <br />
-                <div>Password
-                    <label htmlFor="password" className="sr-only">Password</label>
-                    <input id="password" name="password" type="password" required
-                            className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
+                <div>
+                    <label htmlFor="last-name" className="mt-2 block">Last Name</label>
+                    <input 
+                        id="last_name" 
+                        name="last_name" 
+                        type="text" 
+                        required                            
+                        className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
                     />
                 </div>
-                <br />
-                <div>Confirm Password
-                    <label htmlFor="password" className="sr-only">Confirm Password</label>
-                    <input id="confirmPassword" name="password" type="password" required
-                            className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
+                <div>
+                    <label htmlFor="user-name" className="mt-2 block">User Name</label>
+                    <input 
+                        id="username" 
+                        name="username" 
+                        type="text" 
+                        required
+                        className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                    />
+                </div>                   
+                <div>
+                    <label htmlFor="email-address" className="mt-2 block">Email address</label>
+                    <input 
+                        id="email-address" 
+                        name="email" 
+                        type="email" 
+                        required
+                        className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
+                    />
+                </div>   
+                <div>
+                    <label htmlFor="password" className="mt-2 block">Password</label>
+                    <input 
+                        id="password" 
+                        name="password" 
+                        type="password" 
+                        required
+                        className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="password" className="mt-2 block">Confirm Password</label>
+                    <input 
+                        id="confirmPassword" 
+                        name="password" 
+                        type="password" 
+                        required
+                        className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
                     />
                 </div>
             </div>

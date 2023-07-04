@@ -15,29 +15,36 @@ const LoginForm = () => {
     <div>
         <form className = "bg-secondary py-10 px-4 space-y-4 rounded-xl" onSubmit={handleSubmit}>
             <div className = "text-center text-fourth text-3xl ">Login</div>
-            <div className="rounded-md shadow-sm -space-y-px text-fourth text-xl">Email
+            <div className="rounded-md shadow-sm -space-y-px">
                 <div>
-                    <label htmlFor="email-address" className="sr-only text-fourth text-lg">Email</label>
-                    <input id="email-address" name="email" type="email" required
-                            className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
+                    <label htmlFor="email-address" className="text-fourth text-xl">Email</label>
+                    <input 
+                        id="email-address" 
+                        name="email" 
+                        type="email" 
+                        required
+                        className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
                     />
                 </div>
-                <br />
-                <div>Password
-                    <label htmlFor="password" className="sr-only text-fourth">Password</label>
-                    <input id="password" name="password" type="password" required
-                            className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
+                <div>
+                    <label htmlFor="password" className="text-fourth mt-2 block text-xl">Password</label>
+                    <input 
+                        id="password" 
+                        name="password" 
+                        type="password" 
+                        required
+                        className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
                     />
                 </div>
             </div>
 
             <div className="flex items-center justify-between">
-                <div className="text-sm">
-                    <a href="#" className="font-xl text-fourth hover:text-indigo-500">
+                <div className="text-md">
+                    <a href="#" className="font-xl text-fourth hover:text-black">
                         Forgot your password?
                     </a>
                 </div>
@@ -53,9 +60,9 @@ const LoginForm = () => {
                 <div className = "text-lg text-center text-fourth">Don't have an account yet?</div>
             </div>
             <div className = "flex items-center justify-center">
-            <a href="#" className="font-medium text-fourth hover:text-black">
-                        Sign Up Here!
-                    </a>
+                <a href="#" className="font-medium text-fourth hover:text-black">
+                    Sign Up Here!
+                </a>
             </div>
         </form>
     </div>
