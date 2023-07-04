@@ -17,11 +17,11 @@ const LoginForm = () => {
             <div className = "text-center text-fourth text-3xl ">Login</div>
             <div className="rounded-md shadow-sm -space-y-px">
                 <div>
-                    <label htmlFor="email-address" className="text-fourth text-xl">Email</label>
+                    <label htmlFor="email-address" className="text-fourth text-xl">User Name</label>
                     <input 
-                        id="email-address" 
-                        name="email" 
-                        type="email" 
+                        id="username" 
+                        name="username" 
+                        type="text" 
                         required
                         className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                         value={username}
