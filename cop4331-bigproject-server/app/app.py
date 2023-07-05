@@ -82,5 +82,52 @@ def signup():
         insertion = users.insert_one(new_user)
 
 
+@app.route("/reset-password", methods=["POST"])
+def reset_password():
+    email = request.json.get("email")
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    user = users_collection.find_one({"email": email})
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Generate a random token and store it in the user document
+    token = "abc123"  # Placeholder token, replace with your token generation logic
+    users_collection.update_one({"_id": user["_id"]}, {"$set": {"reset_token": token}})
+
+    # Send the password reset instructions to the user's email
+    # (code for sending email omitted for brevity)
+
+    return jsonify({"message": "Password reset instructions sent", "token": token})
+    
+
+@app.route("/update-password", methods=["POST"])
+def update_password():
+    token = request.json.get("token")
+    new_password = request.json.get("password")
+
+    if not token or not new_password:
+        return jsonify({"error": "Token and new password are required"}), 400
+
+    user = users_collection.find_one({"reset_token": token})
+
+    if not user:
+        return jsonify({"error": "Invalid token"}), 404
+
+    # Hash the new password before storing it
+    hashed_password = hashpw(new_password.encode("utf-8"), gensalt())
+
+    # Update the user's password and remove the reset token
+    users_collection.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"password": hashed_password}, "$unset": {"reset_token": ""}}
+    )
+
+    return jsonify({"message": "Password updated successfully"})
+
+
 if __name__ == '__main__':
     app.run(debug=True)
