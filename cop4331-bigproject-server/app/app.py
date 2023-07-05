@@ -2,6 +2,11 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from bcrypt import checkpw
+from flask_bcrypt import Bcrypt
+from datetime import datetime, timedelta
+from bson.objectid import ObjectId
+import jwt
+import bcrypt
 
 
 # Internal imports
@@ -12,20 +17,32 @@ app = Flask(__name__)
 # MongoDB connection
 db = connect.connect_database()
 
+app.config['SECRET_KEY'] = 'dsadasdasdas'.encode('utf-8')
+
+# MongoDB configuration
+client = MongoClient('mongodb+srv://cop4331group:SzR3ycsGck2W9PzS@bigprojectdb.39szjld.mongodb.net/')
+db = client['BigProjectDatabase']
+users_collection = db['userDatabase']
+
+bcrypt = Bcrypt(app)
 
 @app.route('/login', methods=['POST'])
 def login():
-    users = connect.access_user_collection()
     username = request.json.get('username')
     password = request.json.get('password')
 
     if username and password:
-        user = users.find_one({'username': username})
+        user = users_collection.find_one({'username': username})
 
         if user:
-            # Compare the provided password with the stored password hash
-            if checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
-                return jsonify({'message': 'Login successful'})
+            stored_password = user['password']
+            if bcrypt.check_password_hash(stored_password, password):
+                # Generate JWT token
+                token = jwt.encode({'id': str(user.get('_id')),'username': username,'first': user.get('first_name'),
+                                    'last': user.get('last_name'), 'exp': datetime.utcnow() + timedelta(minutes=30)},
+                                      app.config['SECRET_KEY'], algorithm='HS256')
+
+                return jsonify({'token': token})
             else:
                 return jsonify({'message': 'Invalid password'})
         else:
@@ -52,6 +69,7 @@ def signup():
     # Otherwise, create a new instance of a user
     else:
         # Make all the information received onto one JSON file
+        password = bcrypt.hashpw(password.encode("utf-8"),bcrypt.gensalt())
         new_user = jsonify({
             first_name: 'first_name',
             last_name: 'last_name',
