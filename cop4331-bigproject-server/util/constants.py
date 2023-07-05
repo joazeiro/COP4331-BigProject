@@ -7,3 +7,4 @@ class Keys:
     DB_NAME = "BigProjectDatabase"
     COLLECTION_USER = "userDatabase"
     COLLECTION_REGION = "regionDatabase"
+    SECRET_KEY = "ourcountryprojectforcop4331"
