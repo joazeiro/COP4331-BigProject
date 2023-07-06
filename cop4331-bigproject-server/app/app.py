@@ -1,20 +1,19 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
-from functions.connect import connect_database, access_user_collection
-from util.constants import Keys
+from constants import Keys
 from datetime import datetime, timedelta
 import jwt
 
 # Internal imports
-from functions import connect
+import connect
 
 app = Flask(__name__)
 
 # MongoDB connection
 db = connect.connect_database()
 
-app.config['SECRET_KEY'] = Keys.SECRET_KEY.encode('utf-8')
+app.config['SECRET_KEY'] = Keys.SECRET_KEY
 
 bcrypt = Bcrypt(app)
 
@@ -33,11 +32,11 @@ def login():
             if bcrypt.check_password_hash(stored_password, password):
                 if user['verified'] == True:
                     # Generate JWT token
-                    token = jwt.encode({'id': str(user.get('_id')), 'username': username,
-                                    'exp': datetime.utcnow() + timedelta(minutes=30)},
-                                   app.config['SECRET_KEY'], algorithm='HS256')
+                    token = jwt.encode({'id': str(user.get('_id')),'username': username,'first': user.get('first_name'),
+                                    'last': user.get('last_name'), 'exp': datetime.utcnow() + timedelta(minutes=30)},
+                                      app.config['SECRET_KEY'], algorithm='HS256')
 
-                    return jsonify({'token': token.decode('utf-8')})
+                    return jsonify({'token': token})
                 else:
                     return jsonify({'message':'Email Not Verified!'})
             else:
