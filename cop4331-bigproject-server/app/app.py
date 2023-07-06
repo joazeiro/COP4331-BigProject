@@ -73,7 +73,8 @@ def signup():
             'email': email,
             'password': password_hash,
             'username': username,
-            'verified': False
+            'verified': False,
+            'reset-token':""
         }
 
         # Insert the user
