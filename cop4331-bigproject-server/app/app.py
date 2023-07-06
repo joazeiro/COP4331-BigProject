@@ -104,7 +104,6 @@ def forgot_password():
     users.update_one({"_id": user["_id"]}, {"$set": {"reset_token": token}})
 
     # Send the password reset instructions to the user's email
-    # (code for sending email omitted for brevity)
 
     return jsonify({"message": "Password reset instructions sent", "token": token})
     
@@ -118,7 +117,7 @@ def reset_password():
     if not token or not new_password:
         return jsonify({"error": "Token and new password are required"}), 400
 
-    user = users.collection.find_one({"reset_token": token})
+    user = users.find_one({"reset_token": token})
 
     if not user:
         return jsonify({"error": "Invalid token"}), 404
