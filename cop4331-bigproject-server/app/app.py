@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
 from constants import Keys
 from datetime import datetime, timedelta
-import jwt
+import jwt,uuid
 
 # Internal imports
 import connect
@@ -74,7 +74,7 @@ def signup():
             'password': password_hash,
             'username': username,
             'verified': False,
-            'reset-token':""
+            'reset_token': ""
         }
 
         # Insert the user
@@ -84,8 +84,8 @@ def signup():
 
 
 
-@app.route("/reset-password", methods=["POST"])
-def reset_password():
+@app.route("/forgot-password", methods=["POST"])
+def forgot_password():
         
     users = connect.access_user_collection()
 
@@ -100,7 +100,7 @@ def reset_password():
         return jsonify({"error": "User not found"}), 404
 
     # Generate a random token and store it in the user document
-    token = "abc123"  # Placeholder token, replace with your token generation logic
+    token = uuid.uuid4().hex[:8]
     users.update_one({"_id": user["_id"]}, {"$set": {"reset_token": token}})
 
     # Send the password reset instructions to the user's email
@@ -109,8 +109,8 @@ def reset_password():
     return jsonify({"message": "Password reset instructions sent", "token": token})
     
 
-@app.route("/update-password", methods=["POST"])
-def update_password():
+@app.route("/reset-password", methods=["POST"])
+def reset_password():
     users = connect.access_user_collection()
     token = request.json.get("token")
     new_password = request.json.get("password")
