@@ -8,3 +8,6 @@ class Keys:
     COLLECTION_USER = "userDatabase"
     COLLECTION_REGION = "regionDatabase"
     SECRET_KEY = "ourcountryprojectforcop4331"
+    MAIL_USERNAME = "noreply.geobook@gmail.com"
+    MAIL_PASSWORD = "Oitudobem10" 
+    MAIL_SERVER = "smtp.gmail.com"
