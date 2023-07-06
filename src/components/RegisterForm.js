@@ -12,7 +12,7 @@ const RegisterForm = () => {
 }
   return (
     <div>
-        <form className = "bg-secondary py-10 px-4 space-y-4 rounded-xl" onSubmit={handleSubmit}>
+        <form style={{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="py-10 px-4 space-y-4 rounded-xl" onSubmit={handleSubmit}>
             <div className = "text-center text-fourth text-3xl ">Sign Up</div>
             <div className="rounded-md shadow-sm -space-y-px text-fourth text-xl">
                 <div>
