@@ -9,5 +9,5 @@ class Keys:
     COLLECTION_REGION = "regionDatabase"
     SECRET_KEY = "ourcountryprojectforcop4331"
     MAIL_USERNAME = "noreply.geobook@gmail.com"
-    MAIL_PASSWORD = "Oitudobem10" 
+    MAIL_PASSWORD = "enxwxepabtwzuusy" 
     MAIL_SERVER = "smtp.gmail.com"

@@ -16,10 +16,9 @@ app = Flask(__name__)
 
 # MongoDB connection
 db = connect.connect_database()
-
 app.config['MAIL_SERVER'] = Keys.MAIL_SERVER
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = Keys.MAIL_USERNAME
 app.config['MAIL_PASSWORD'] = Keys.MAIL_PASSWORD
 app.config['SECRET_KEY'] = Keys.SECRET_KEY
@@ -88,7 +87,7 @@ def signup():
     else:
 
         # Generate verification token
-        token = generate_verification_token()
+        token = uuid.uuid4().hex[:8]
 
         # Create a verification link using the token
         verification_link = f"http://your-app.com/verify/{token}"
