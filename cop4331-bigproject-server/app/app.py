@@ -1,22 +1,18 @@
 from flask import Flask, request, jsonify, url_for
 from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
-from util.constants import Keys
+from constants import Keys
 from datetime import datetime, timedelta
-import jwt,uuid
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from random import choice
 from string import ascii_letters, digits
 
 # Internal imports
-from functions import connect
-from flask_cors import CORS
-from bson import ObjectId
-
-# Internal imports
 import connect
 import jwt,uuid
+from flask_cors import CORS
+from bson import ObjectId
 
 app = Flask(__name__)
 
@@ -33,6 +29,7 @@ app.config['SECRET_KEY'] = Keys.SECRET_KEY
 
 bcrypt = Bcrypt(app)
 mail = Mail(app)
+CORS(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 
@@ -89,14 +86,10 @@ def signup():
         token = uuid.uuid4().hex[:8]
 
         # Create a verification link using the token
-        #verification_link = f"http://your-app.com/verify/{token}"
-        # Send verification email
-        #msg = Message("Email Verification", recipients=[email])
-        
         verification_link = f"http://127.0.0.1:5000/verify/{token}"
 
         # Send verification email
-        msg = Message("Email Verification", recipients=[email],sender=app.config["MAIL_DEFAULT_SENDER"])
+        msg = Message("Email Verification", recipients=[email])
         msg.body = f"Thank you for registering. Please click the link to verify your email: {verification_link}"
         mail.send(msg)
 
@@ -110,15 +103,14 @@ def signup():
             'password': password_hash,
             'username': username,
             'verified': False,
-            'reset_token': ""
+            'reset_token': "",
+            'verify_token': token
         }
 
         # Insert the user
         users.insert_one(new_user)
 
         return jsonify({'message': 'You were successfully registered! Check your email for the email verification.'})
-
-
 
 @app.route("/forgot-password", methods=["POST"])
 def forgot_password():
@@ -164,7 +156,7 @@ def reset_password():
         return jsonify({"error": "Invalid token"}), 404
 
     # Hash the new password before storing it
-    hashed_password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+    hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
 
     # Update the user's password and remove the reset token
     users.update_one(
@@ -178,18 +170,10 @@ def reset_password():
 @app.route('/verify/<token>', methods=['GET'])
 def verify_email(token):
     # Verify the token
-    try:
-        # Toke will expire after 1 hour, maybe make this bigger (?)
-        email = serializer.loads(token, max_age=3600)
-    except:
-        # Invalid or expired token
-        return jsonify({'message': 'Invalid or expired verification token.'}), 400
 
-    # Update user's email verification status in the database
-    # Your implementation here
     users = connect.access_user_collection()
 
-    user = users.find_one({'email': email})
+    user = users.find_one({'verify_token': token})
 
     if not user:
         return jsonify({"error": "Invalid email being verified"}), 404
@@ -199,7 +183,6 @@ def verify_email(token):
         {"$set": {"verified": True}})
     
     return jsonify({'message': 'Email verified successfully.'})
-
 
 @app.route('/new-post', methods=['POST'])
 def new_post():
