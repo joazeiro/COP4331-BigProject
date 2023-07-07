@@ -8,5 +8,5 @@ class Keys:
     COLLECTION_POST = "postDatabase"
     SECRET_KEY = "ourcountryprojectforcop4331"
     MAIL_USERNAME = "noreply.geobook@gmail.com"
-    MAIL_PASSWORD = "enxwxepabtwzuusy"
+    MAIL_PASSWORD = "enxwxepabtwzuusy" 
     MAIL_SERVER = "smtp.gmail.com"

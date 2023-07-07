@@ -1,12 +1,16 @@
 from flask import Flask, request, jsonify, url_for
 from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
-from constants import Keys
+from util.constants import Keys
 from datetime import datetime, timedelta
+import jwt,uuid
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from random import choice
 from string import ascii_letters, digits
+
+# Internal imports
+from functions import connect
 from flask_cors import CORS
 from bson import ObjectId
 
@@ -18,7 +22,6 @@ app = Flask(__name__)
 
 # MongoDB connection
 db = connect.connect_database()
-
 app.config['MAIL_SERVER'] = Keys.MAIL_SERVER
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
@@ -31,6 +34,7 @@ app.config['SECRET_KEY'] = Keys.SECRET_KEY
 bcrypt = Bcrypt(app)
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -85,6 +89,10 @@ def signup():
         token = uuid.uuid4().hex[:8]
 
         # Create a verification link using the token
+        #verification_link = f"http://your-app.com/verify/{token}"
+        # Send verification email
+        #msg = Message("Email Verification", recipients=[email])
+        
         verification_link = f"http://127.0.0.1:5000/verify/{token}"
 
         # Send verification email
@@ -132,7 +140,6 @@ def forgot_password():
     users.update_one({"_id": user["_id"]}, {"$set": {"reset_token": token}})
 
     # Send the password reset instructions to the user's email
-
     pwd_reset_link = f'http://127.0.0.1:5000/reset-password'
 
     msg = Message("Password Reset Email", recipients=[email])
@@ -193,6 +200,7 @@ def verify_email(token):
     
     return jsonify({'message': 'Email verified successfully.'})
 
+
 @app.route('/new-post', methods=['POST'])
 def new_post():
     author = request.json.get("username")
@@ -242,6 +250,7 @@ def new_comment():
     posts.update_one({'_id': ObjectId(id)}, {'$set': {'comments': post['comments']}})
 
     return jsonify({"message":"Comment Added."})
+  
 
 if __name__ == '__main__':
     app.run(debug=True)
