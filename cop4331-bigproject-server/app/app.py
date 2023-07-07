@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, url_for
 from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
 from util.constants import Keys
@@ -11,6 +11,12 @@ from string import ascii_letters, digits
 
 # Internal imports
 from functions import connect
+from flask_cors import CORS
+from bson import ObjectId
+
+# Internal imports
+import connect
+import jwt,uuid
 
 app = Flask(__name__)
 
@@ -19,22 +25,15 @@ db = connect.connect_database()
 app.config['MAIL_SERVER'] = Keys.MAIL_SERVER
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = "noreply.geobook@gmail.com"
 app.config['MAIL_USERNAME'] = Keys.MAIL_USERNAME
 app.config['MAIL_PASSWORD'] = Keys.MAIL_PASSWORD
 app.config['SECRET_KEY'] = Keys.SECRET_KEY
 
+
 bcrypt = Bcrypt(app)
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-
-# Auxililary functions - Not routing related
-
-def generate_verification_token():
-    # Generate a random verification token
-    characters = ascii_letters + digits
-    token = ''.join(choice(characters) for _ in range(32))
-    return token
-
 
 
 @app.route('/login', methods=['POST'])
@@ -90,10 +89,14 @@ def signup():
         token = uuid.uuid4().hex[:8]
 
         # Create a verification link using the token
-        verification_link = f"http://your-app.com/verify/{token}"
+        #verification_link = f"http://your-app.com/verify/{token}"
+        # Send verification email
+        #msg = Message("Email Verification", recipients=[email])
+        
+        verification_link = f"http://127.0.0.1:5000/verify/{token}"
 
         # Send verification email
-        msg = Message("Email Verification", recipients=[email])
+        msg = Message("Email Verification", recipients=[email],sender=app.config["MAIL_DEFAULT_SENDER"])
         msg.body = f"Thank you for registering. Please click the link to verify your email: {verification_link}"
         mail.send(msg)
 
@@ -137,8 +140,7 @@ def forgot_password():
     users.update_one({"_id": user["_id"]}, {"$set": {"reset_token": token}})
 
     # Send the password reset instructions to the user's email
-
-    pwd_reset_link = f'http://your-app.com/reset-password'
+    pwd_reset_link = f'http://127.0.0.1:5000/reset-password'
 
     msg = Message("Password Reset Email", recipients=[email])
     msg.body = f"You have requested a password reset. Your reset token is {token}. Please go to the following link to finalize this process {pwd_reset_link}"
@@ -192,13 +194,63 @@ def verify_email(token):
     if not user:
         return jsonify({"error": "Invalid email being verified"}), 404
     
-    
     users.update_one(
         {"email": user["email"]},
         {"$set": {"verified": True}})
     
     return jsonify({'message': 'Email verified successfully.'})
 
+
+@app.route('/new-post', methods=['POST'])
+def new_post():
+    author = request.json.get("username")
+    title = request.json.get("title")
+    content = request.json.get("body")
+    tag = request.json.get("tag")
+
+    posts = connect.access_post_collection()
+
+    new_post = {'author':author, 'title': title, 'content':content, 'tag':tag, 'comments':[]}
+
+    posts.insert_one(new_post)
+
+    post = posts.find_one({'content':content})
+
+    return jsonify({'message':"Post Added."})
+
+@app.route('/edit-post', methods=['POST'])
+def edit_post():
+    post_id = request.json.get('id')
+    new_title = request.json.get('title')
+    new_body = request.json.get("body")
+    new_tag = request.json.get("tag")
+
+    posts = connect.access_post_collection()
+    post = posts.find_one({'_id':ObjectId(post_id)})
+    
+    posts.update_one({'_id':ObjectId(post_id)}, {'$set':{'title':new_title,'content':new_body, 'tag':new_tag}})
+
+    return jsonify({'message':"Edit Successful"})
+
+@app.route('/new-comment',methods = ['POST'])
+def new_comment():
+    
+    id = request.json.get("id")
+    author = request.json.get("username")
+    content = request.json.get("body") 
+    posted = datetime.now().strftime("%d-%m-%Y")
+
+    posts = connect.access_post_collection()
+
+    post = posts.find_one({"_id":ObjectId(id)})
+
+    comment = {'id':ObjectId(id), 'author':author, "content":content, 'posted':posted }
+    post["comments"].append(comment)
+
+    posts.update_one({'_id': ObjectId(id)}, {'$set': {'comments': post['comments']}})
+
+    return jsonify({"message":"Comment Added."})
+  
 
 if __name__ == '__main__':
     app.run(debug=True)

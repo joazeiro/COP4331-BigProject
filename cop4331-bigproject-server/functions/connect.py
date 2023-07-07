@@ -1,7 +1,6 @@
 import pymongo
-from util.constants import Keys
+from constants import Keys
 import sys
-
 
 def connect_database():
     db_connection = pymongo.MongoClient(Keys.DB_URI, connectTimeoutMS=30000, socketTimeoutMS=None, connect=False, maxPoolsize=1)
@@ -17,15 +16,8 @@ def access_user_collection():
     return user_collection
 
 
-def access_region_collection():
+def access_post_collection():
     db = connect_database()
-    region_collection = db[Keys.COLLECTION_REGION]
+    post_collection = db[Keys.COLLECTION_POST]
 
-    return region_collection
-    
-
-# this is test function
-def get_first():
-    print(access_user_collection().find().sort('$natural', -1).next())
-    print(access_region_collection().find().sort('$natural', -1).next())
-
+    return post_collection
