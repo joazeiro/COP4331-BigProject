@@ -29,7 +29,6 @@ app.config['SECRET_KEY'] = Keys.SECRET_KEY
 
 bcrypt = Bcrypt(app)
 mail = Mail(app)
-CORS(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 
