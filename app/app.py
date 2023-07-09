@@ -32,7 +32,7 @@ mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 @app.route('/', methods=['POST'])
-def run()
+def run():
     return jsonify({'message':"Hello World"})
 
 @app.route('/login', methods=['POST'])
