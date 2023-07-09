@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for
-from pymongo import MongoClient
+from bson import ObjectId
 from flask_bcrypt import Bcrypt
 from constants import Keys
 from datetime import datetime, timedelta
@@ -9,10 +9,10 @@ from random import choice
 from string import ascii_letters, digits
 
 # Internal imports
+from pymongo import MongoClient
 import connect
 import jwt,uuid
 from flask_cors import CORS
-from bson import ObjectId
 
 app = Flask(__name__)
 
