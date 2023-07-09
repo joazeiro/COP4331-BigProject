@@ -232,7 +232,52 @@ def new_comment():
     posts.update_one({'_id': ObjectId(id)}, {'$set': {'comments': post['comments']}})
 
     return jsonify({"message":"Comment Added."})
-  
+
+@app.route('/search', methods=['GET'])
+def search_posts():
+    request_data = request.get_json()
+    tag = request_data.get('tag')
+    page = int(request_data.get('page', 1))
+    limit = int(request_data.get('limit', 10))
+
+    posts = connect.access_post_collection()
+
+    matching_posts = posts.find({'tag': tag}).skip((page - 1) * limit).limit(limit)
+
+    response = []
+    for post in matching_posts:
+        response.append({
+            'id': str(post['_id']),
+            'author': post['author'],
+            'title': post['title'],
+            'content': post['content'],
+            'tag': post['tag'],
+            'comments': post['comments']
+        })
+
+    return jsonify(response)
+
+@app.route('/search-user-posts', methods=['GET'])
+def search_user_posts():
+    username = request.json.get('username')
+
+    posts = connect.access_post_collection()
+
+    matching_posts = posts.find({'author': username})
+
+    response = []
+    for post in matching_posts:
+        response.append({
+            'id': str(post['_id']),
+            'author': post['author'],
+            'title': post['title'],
+            'content': post['content'],
+            'tag': post['tag'],
+            'comments': post['comments']
+        })
+
+    return jsonify(response)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
