@@ -282,8 +282,4 @@ def search_user_posts():
     return jsonify(response)
 
 if __name__ == '__main__':
-    app.run()
-
-
-if __name__ == '__main__':
     app.run(debug=True)
