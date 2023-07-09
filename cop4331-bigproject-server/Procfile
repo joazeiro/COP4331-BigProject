@@ -1,1 +1,1 @@
-web: gunicorn cop4331-bigproject-server.app:app
+web: gunicorn app:app
