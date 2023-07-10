@@ -8,7 +8,6 @@ def connect_database():
 
     return db
 
-
 def access_user_collection():
     db = connect_database()
     user_collection = db[Keys.COLLECTION_USER]
