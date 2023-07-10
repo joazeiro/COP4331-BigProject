@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, url_for
+from bson import ObjectId
 from flask_bcrypt import Bcrypt
 from constants import Keys
 from datetime import datetime, timedelta
@@ -30,8 +31,8 @@ bcrypt = Bcrypt(app)
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-@app.route('/')
-def home():
+@app.route('/', methods=['POST'])
+def run():
     return jsonify({'message':"Hello World"})
 
 @app.route('/login', methods=['POST'])
@@ -279,6 +280,7 @@ def search_user_posts():
         })
 
     return jsonify(response)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
