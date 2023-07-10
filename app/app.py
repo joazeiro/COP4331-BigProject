@@ -30,8 +30,8 @@ bcrypt = Bcrypt(app)
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-@app.route('/', methods=['POST'])
-def run():
+@app.route('/')
+def home():
     return jsonify({'message':"Hello World"})
 
 @app.route('/login', methods=['POST'])
@@ -279,7 +279,6 @@ def search_user_posts():
         })
 
     return jsonify(response)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
