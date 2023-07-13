@@ -4,7 +4,7 @@ import FormTitle from '@/components/FormTitle'
 import FormContainer from '@/components/FormContainer'
 import EmailVerify from '@/components/EmailVerify'
 
-export default function LoginPage() {
+export default function verificationPage() {
   return (
     <FormContainer>
         <FormTitle/>

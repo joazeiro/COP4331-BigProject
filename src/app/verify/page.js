@@ -2,13 +2,13 @@
 
 import FormTitle from '@/components/FormTitle'
 import FormContainer from '@/components/FormContainer'
-import ResetPassword from '@/components/ResetPassword'
+import Verified from '@/components/Verified'
 
-export default function ResetPasswordPage() {
+export default function VerifiedPage() {
   return (
     <FormContainer>
         <FormTitle/>
-        <ResetPassword/>  
+        <Verified/>  
     </FormContainer>
     )
 }

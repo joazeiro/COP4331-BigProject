@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const RegisterForm = () => {
     const router = useRouter();
@@ -9,9 +10,11 @@ const RegisterForm = () => {
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
 
     const handleRegister = async (e) => {
         e.preventDefault()
+        const apiUrl = process.env.API_URL;
 
         if (confirmPassword !== password)
         {
@@ -20,34 +23,34 @@ const RegisterForm = () => {
 
         try 
         {
-            const response = await fetch('/temp',
+            const response = await fetch(apiUrl + '/signup',
             {
                 method: 'POST',
                 headers: 
                 {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username, password, firstName, lastName, email })
+                body: JSON.stringify(
+                    { 
+                        username: username, 
+                        password: password,
+                        first_name: firstName, 
+                        last_name: lastName, 
+                        email: email 
+                    }
+                )
             });
       
             if (response.ok) 
-            {
+            {                
                 router.push(`/register/verification`);
             } 
 
             else if (response.status === 401) 
             {
-                // Unauthorized: Invalid credentials
-                console.log('Invalid credentials');
-                // Display an error message to the user
+                // An error has occured
+                setErrorMessage(data.message);
             } 
-            
-            else
-            {
-                // Other error occurred
-                console.log('An error occurred');
-                // Display a generic error message to the user
-            }
           } 
           catch (error) 
           {
@@ -143,9 +146,12 @@ const RegisterForm = () => {
                 <div className = "text-md text-center text-black">Already have an account?</div>
             </div>
             <div className = "flex items-center justify-center">
-                    <a href="/login" className="font-medium text-fourth hover:text-black">
+                    <Link href="/login" className="font-medium text-fourth hover:text-black">
                         Login Here!
-                    </a>
+                    </Link>
+            </div>
+            <div className = "flex items-center justify-center">
+                <div className = "text-md text-center text-black">{errorMessage}</div>
             </div>
         </form>
     </div>

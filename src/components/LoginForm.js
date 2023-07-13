@@ -2,38 +2,51 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const LoginForm = () => {
     const router = useRouter();
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+    const apiUrl = process.env.API_URL;
 
     const handleSubmit = async (e) => {
             e.preventDefault()
-
+            // console.log('API_URL:', process.env.API_URL);
+            // const loginUrl = process.env.API_URL + '/login';
+            // console.log('Login URL:', loginUrl);
             try
             {
-                const response = await fetch('/temp',
+                const response = await fetch(apiUrl + '/login',
                 {
                     method: 'POST',
                     headers:
                     {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({username, password})
+                    body: JSON.stringify(
+                        {
+                            username: username, 
+                            password: password
+                        }
+                    )
                 });
 
                 if (response.ok)
                 {
                     const data = await response.json();
                     const authToken = data.token;
+                    console.log(authToken);
 
                     localStorage.setItem('personalToken', authToken);
                     router.push('/');
                 }
                 else if (response.status === 401)
                 {
-                    console.log('Invalid Credentials');
+                    // An error has occured
+                    const data = await response.json();
+                    setErrorMessage(data.message)
                 }
 
                 else 
@@ -80,9 +93,9 @@ const LoginForm = () => {
 
                 <div className="flex items-center justify-between">
                     <div className="text-md">
-                        <a href="/login/forgot-password" className="font-xl text-fourth hover:text-black">
+                        <Link href="/login/forgot-password" className="font-xl text-fourth hover:text-black">
                             Forgot your password?
-                        </a>
+                        </Link>
                     </div>
                 </div>
 
@@ -96,9 +109,12 @@ const LoginForm = () => {
                     <div className = "text-lg text-center text-fourth">Don't have an account yet?</div>
                 </div>
                 <div className = "flex items-center justify-center">
-                    <a href="/register" className="font-medium text-fourth hover:text-black">
+                    <Link href="/register" className="font-medium text-fourth hover:text-black">
                         Sign Up Here!
-                    </a>
+                    </Link>
+                </div>
+                <div className = "flex items-center justify-center">
+                    <div className = "text-lg text-center text-black">{errorMessage}</div>
                 </div>
         </form>
     </div>

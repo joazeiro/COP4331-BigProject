@@ -1,37 +1,43 @@
 'use client'
 
 import { useState } from 'react';
+import Link from 'next/link'
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+    const apiUrl = process.env.API_URL;
 
     const handleEmail = async (e) => {
             e.preventDefault()
 
             try
             {
-                const response = await fetch('/temp',
+                const response = await fetch(apiUrl + '/forgot-password',
                 {
                     method: 'POST',
                     headers:
                     {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({email})
+                    body: JSON.stringify(   
+                        {
+                            email: email
+                        }
+                    )
                 });
+
+                const data = await response.json();
 
                 if (response.ok)
                 {
-                    
-                }
-                else if (response.status === 400)
-                {
-                    console.log('Email Required');
+                    setErrorMessage(data.message);
                 }
 
-                else if (response.status === 404)
+                else if (response.status === 401)
                 {
-                    console.log('User Not Found')
+                    // An error has occured
+                    setErrorMessage(data.error);
                 }
 
                 else 
@@ -69,9 +75,12 @@ const ForgotPassword = () => {
                     </button>
                 </div>
                 <div className = "flex items-center justify-center">
-                    <a href="/login" className="font-medium text-fourth hover:text-black">
+                    <Link href="/login" className="font-medium text-fourth hover:text-black">
                         Go Back to Login
-                    </a>
+                    </Link>
+                </div>
+                <div className = "flex items-center justify-center">
+                    <div className = "text-md text-center text-black">{errorMessage}</div>
                 </div>
         </form>
     </div>
