@@ -97,7 +97,7 @@ const CreatePost = () => {
                         onChange = {e => setContent(e.target.value)}
                     />
                 </div>
-                <div className = "px-40">
+                <div className = "px-32">
                     <button type="Submit"
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-fourth hover:bg-third focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Create Post
