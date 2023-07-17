@@ -1,18 +1,19 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 
-const Verified = () => {
-
+const Verified = () => 
+{
   const apiUrl = process.env.API_URL;
   const router = useRouter()
   const UrlParams = useSearchParams();
   const token = UrlParams.get('token');
 
-  const handleVerify = async (e) => 
+  const handleVerify = async () => 
   {
-    e.preventDefault();
+    // Makes a stall before it transfer you to the next page ('/login')
+    await new Promise((resolve) => setTimeout(resolve, 5000)); 
       const response = await fetch(apiUrl + '/verify/' + token,
       {
           method: 'GET',
@@ -28,6 +29,16 @@ const Verified = () => {
       }
   }
 
+  useEffect(() =>
+  {
+    if (token)
+    {
+      handleVerify();
+    }
+
+  }, [router, token, apiUrl]);
+  
+
   return (
     <div>
         <form style={{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl" onClick={handleVerify}>
@@ -35,12 +46,6 @@ const Verified = () => {
                 <div className = "text-center flex text-fourth text-3xl mt-8">
                     You have been verified! Have fun with your future adventures! Thank you!
                 </div>
-            </div>
-            <div className = "mx-16">
-              <button type="button"
-                      className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-fourth hover:bg-third focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                  Go to Login
-              </button>
             </div>
         </form>
     </div>
