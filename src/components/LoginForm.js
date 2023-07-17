@@ -63,7 +63,7 @@ const LoginForm = () => {
   return (
     <div>
         <form style={{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl" onSubmit={handleSubmit}>            
-            <div className = "text-center text-fourth text-5xl ">Login</div>
+            <div className = "text-center text-fourth text-5xl">Login</div>
                 <div className="rounded-md shadow-sm -space-y-px">
                     <div>
                         <label htmlFor="email-address" className="text-fourth text-xl">User Name</label>

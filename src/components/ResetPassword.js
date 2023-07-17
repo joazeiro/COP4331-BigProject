@@ -2,15 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation';
 
 const ForgotPassword = () => {
-    const [token, setToken] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [confirmNewPassword, setConfirmNewPassword] = useState('')
+    const urlParams = useSearchParams();
+    const token = urlParams.get('token');
     const apiUrl = process.env.API_URL;
     const router = useRouter();
 
-    const handleEmail = async (e) => {
+    const handleEmail = async (e) => 
+    {
             e.preventDefault()
 
             if (newPassword !== confirmNewPassword)
@@ -20,8 +23,8 @@ const ForgotPassword = () => {
 
             try
             {
-                const response = await fetch(apiUrl + '/reset-password',
-                {
+                const response = await fetch(apiUrl + '/reset-password/' + token,
+                { 
                     method: 'POST',
                     headers:
                     {
@@ -29,7 +32,6 @@ const ForgotPassword = () => {
                     },
                     body: JSON.stringify(
                         {
-                            token: token, 
                             password: newPassword
                         }
                     )
@@ -56,6 +58,7 @@ const ForgotPassword = () => {
                     console.log('An Error Occurred');
                 }
             }
+
             catch (error)
             {
                 console.log('An Error Occurred', error);
@@ -66,18 +69,6 @@ const ForgotPassword = () => {
         <form style={{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl" onSubmit={handleEmail}>            
             <div className = "text-center text-fourth text-5xl ">Forgot Password</div>
                 <div className="rounded-md shadow-sm -space-y-px">
-                    <div>
-                        <label htmlFor="token" className="text-fourth mt-6 block text-xl">Token</label>
-                        <input 
-                            id="token" 
-                            name="token" 
-                            type="text" 
-                            required
-                            className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={token}
-                            onChange={e => setToken(e.target.value)}
-                        />
-                    </div>
                     <div>
                         <label htmlFor="newPassword" className="text-fourth mt-6 block text-xl">New Password</label>
                         <input 
