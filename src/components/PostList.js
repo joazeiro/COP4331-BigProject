@@ -55,7 +55,7 @@ export const PostList = () => {
         } 
     };
 
-    const pushToPostPage = async () =>
+    const pushToPostPage = async (post) =>
     {
         try
         {
@@ -80,7 +80,8 @@ export const PostList = () => {
 
             if (response.ok)
             {
-                router.push('/')
+                localStorage.setItem('postID', post._id);
+                router.push(`/post/${post._id}`);
             }
             else 
             {
@@ -97,7 +98,28 @@ export const PostList = () => {
     {
         setPosts([]);
         setLoading(true);
-        fetchPosts();
+
+        // Delaying api calls till user finishes in order to prevent
+        // weird behavior
+
+        let delayTimer; 
+
+        const delayedFetch = () => 
+        {
+            clearTimeout(delayTimer);
+            delayTimer = setTimeout(() => 
+            {
+                fetchPosts();
+            }, 500); // Delay of 5 milliseconds, it seemed good enough without breaking the calls and being too slow
+        }
+
+        delayedFetch();
+
+        return () => 
+        {
+            clearTimeout(delayTimer);
+        }
+
     }, [searchQuery]);
 
     if (loading) 
@@ -112,13 +134,13 @@ export const PostList = () => {
   return (
     <div>
       {posts.map((post) => (
-        <div key={post._id} className = "mb-8 text-fourth">
-            <form style={{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl">
-            <div>Created By {post.author} <span className= "ml-20">Posted On: {post.posted} </span></div>
+        <div key = {post._id} className = "mb-8 text-fourth">
+            <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl">
+            <div>Created By {post.author} <span className = "ml-20">Posted On: {post.posted} </span></div>
             <div className = "text-4xl">{post.title}<span className = "ml-10 text-3xl text-fourth inline-block bg-primary px-2 rounded-full">{post.tag}</span></div>
             <div className = "text-lg">{post.content}</div>
             <div className = "flex justify-center">
-                <button type = "button"className = "px-4 py-2 ml-4 bg-fourth text-primary text-xl rounded-full" onClick = {pushToPostPage}>Read More</button>
+                <button type = "button"className = "px-4 py-2 ml-4 bg-fourth text-primary text-xl rounded-full" onClick = {() => pushToPostPage(post)}>Read More</button>
             </div>
             </form>
         </div>

@@ -85,7 +85,7 @@ const CreatePost = () =>
 
     return (
         <div>
-            <form style={{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl" onSubmit={handleCreatePost}>            
+            <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl" onSubmit={handleCreatePost}>            
                 <div className = "text-center text-fourth text-5xl">Create Post
                     <div className = "text-center flex-center text-fourth text-xl py-2">Here, you can do whatever your heart desires! You can ask
                     questions, discuss your favorite memories, or recommend to other people the cool things you have seen in your trip!</div>

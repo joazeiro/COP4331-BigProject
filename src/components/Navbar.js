@@ -95,7 +95,7 @@ const Navbar = () => {
     }
 
     return (
-        <nav className="flex justify-between w-full py-3 px-4" style={{ background: 'linear-gradient(180deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }}>
+        <nav className="flex justify-between w-full py-3 px-4" style = {{ background: 'linear-gradient(180deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }}>
             <div className = "text-4xl text-fourth">GeoBook</div>
                 <ul className = "flex justify-between">
                     <li>
