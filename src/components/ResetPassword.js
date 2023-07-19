@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 const ForgotPassword = () => {
     const [newPassword, setNewPassword] = useState('')
     const [confirmNewPassword, setConfirmNewPassword] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
     const urlParams = useSearchParams();
     const token = urlParams.get('token');
     const apiUrl = process.env.API_URL;
@@ -18,7 +19,7 @@ const ForgotPassword = () => {
 
             if (newPassword !== confirmNewPassword)
             {
-                console.log("Passwords Must Match");
+                setErrorMessage("Passwords Must Match");
             }
 
             try
@@ -39,18 +40,14 @@ const ForgotPassword = () => {
 
                 if (response.ok)
                 {
-                    console.log('Password Updated Successfully');
+                    setErrorMessage(data.message);
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
                     router.push('/login');
                 }
 
-                else if (response.status === 400)
+                else if (response.status === 401)
                 {
-                    console.log('Token and New Password are Required.');
-                }
-
-                else if (response.status === 404)
-                {
-                    console.log('Invalid Token')
+                    setErrorMessage(data.error);
                 }
 
                 else 
@@ -99,6 +96,9 @@ const ForgotPassword = () => {
                             className="group relative w-full flex justify-center mt-8 py-2 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-fourth hover:bg-third focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Make New Password
                     </button>
+                </div>
+                <div className = "flex items-center justify-center">
+                    {errorMessage}
                 </div>
         </form>
     </div>

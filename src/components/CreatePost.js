@@ -1,56 +1,85 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-const CreatePost = () => {
+const CreatePost = () => 
+{
     const router = useRouter();
     const [title, setTitle] = useState('');
     const [tag, setTag] = useState('');
     const [content, setContent] = useState('');
-    const [errorMessage, setErrorMessage] = useState('')
+    const [countries, setCountries] = useState([]);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [errorCountry, setErrorCountry] = useState('');
     const apiUrl = process.env.API_URL;
+
+    useEffect(() => 
+    {
+        fetch('https://restcountries.com/v3.1/all').then(response => response.json())
+            .then(data => 
+            {
+                const countryNames = data.map(country => country.name.common);
+                setCountries(countryNames);
+            })
+            .catch(error => 
+            {
+                console.log('An error occurred while fetching country data:', error);
+            });
+      }, []);
+
+    function validateCountry(country)
+    {
+        return countries.includes(country);
+    }
 
     const handleCreatePost = async (e) =>
     {
         e.preventDefault();
         const token = localStorage.getItem('personalToken');
-
-        try
+        
+        if (validateCountry(tag))
         {
-            const response = await fetch(apiUrl + '/new-post',
+            try
             {
-                method: 'POST',
-                headers:
+                const response = await fetch(apiUrl + '/new-post',
                 {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(
+                    method: 'POST',
+                    headers:
                     {
-                        token: token,
-                        title: title,
-                        tag: tag,
-                        body: content
-                    }
-                )
-            });
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(
+                        {
+                            token: token,
+                            title: title,
+                            tag: tag,
+                            body: content
+                        }
+                    )
+                });
 
-            if (response.ok)
-            {
-                const data = await response.json();
-                const authToken = data.token;
-                localStorage.setItem('personalToken', authToken)
-                router.push('/')
+                if (response.ok)
+                {
+                    const data = await response.json();
+                    const authToken = data.token;
+                    localStorage.setItem('personalToken', authToken)
+                    router.push('/')
+                }
+
+                if (response.status === 404)
+                {
+                    setErrorMessage(data.Error);
+                }
             }
 
-            if (response.status === 404)
+            catch(error)
             {
-                setErrorMessage(data.Error);
+                console.log('An Error Occurred', error);
             }
         }
-
-        catch(error)
+        else
         {
-            console.log('An Error Occurred', error);
+            setErrorCountry('Please Input a Valid Country');
         }
     }
 
@@ -85,6 +114,9 @@ const CreatePost = () => {
                         value={tag}
                         onChange={e => setTag(e.target.value)}
                     />
+                </div>
+                <div className = "flex items-center justify-center">
+                    <div className = "text-lg text-center text-black">{errorCountry}</div>
                 </div>
                 <div className = "px-10">
                     <label className = "text-fourth text-xl">Content</label>

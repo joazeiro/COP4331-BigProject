@@ -7,7 +7,7 @@ import { SearchContext } from './SearchContext';
 const Navbar = () => {
     const router = useRouter();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [searchQuery, setSearchQuery] = useContext(SearchContext);
+    const { searchQuery, setSearchQuery } = useContext(SearchContext);
     const apiUrl = process.env.API_URL;
 
     useEffect(() => 
