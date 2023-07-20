@@ -121,13 +121,13 @@ const Navbar = () => {
                     ) : (
                         <>
                             <li>
-                                <button className = "px-4 py-2 ml-4 bg-fourth text-third text-xl rounded-full" onClick = {pushToCreatePost}>Create Post</button>
+                                <button className = "px-4 py-2 ml-4 bg-primary text-fourth text-xl rounded-full" onClick = {pushToCreatePost}>Create Post</button>
                             </li>
                             <li>
                                 <button className = "px-4 py-2 ml-4 bg-fourth text-third text-xl rounded-full" onClick = {pushToMyAccount}>My Account</button>
                             </li>
                             <li>
-                                <button className = "px-4 py-2 ml-4 bg-fourth text-third text-xl rounded-full" onClick = {pushToLogOut}>Sign Out</button>
+                                <button className = "px-4 py-2 ml-4 bg-fourth text-primary text-xl rounded-full" onClick = {pushToLogOut}>Sign Out</button>
                             </li>
                         </>
                     )}  

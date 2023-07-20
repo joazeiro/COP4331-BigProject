@@ -3,20 +3,40 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { SearchContext } from './SearchContext';
+import Modal from 'react-modal';
 
 export const PostList = () => {
     const router = useRouter();
     const { searchQuery } = useContext(SearchContext);
     const [posts, setPosts] = useState([]);
+    const [invalidToken, setInvalidToken] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(null);
     const apiUrl = process.env.API_URL;
-    let token = null;
-  
-    if (typeof window !== 'undefined') 
+    
+    useEffect(() =>
     {
-        // Check if running on the client-side
-        token = localStorage.getItem('personalToken');
-    }
+        if (typeof window !== 'undefined') 
+        {
+            // Check if running on the client-side
+            setToken(localStorage.getItem('personalToken'));
+        }
+    }, []);
+
+    useEffect(() =>
+    {
+        let timer
+        if (invalidToken)
+        {
+            timer = setTimeout(() => 
+            {
+                setInvalidToken(false);
+                router.push('/login');
+            }, 4000)
+        }
+
+        return () => clearTimeout(timer);
+    }, [invalidToken])
 
     const fetchPosts = async () => 
     {
@@ -57,13 +77,17 @@ export const PostList = () => {
 
     const pushToPostPage = async (post) =>
     {
+        const personalToken = localStorage.getItem('personalToken');
+        console.log(personalToken);
+
+        if (personalToken === '' || personalToken === 'null' || !personalToken || personalToken === null)
+        {
+            setInvalidToken(true);
+            return;
+        }
+
         try
         {
-            if (!token)
-            {
-                router.push('/login');
-            }
-
             const response = await fetch(apiUrl + '/',
             {
                 method: 'POST',
@@ -74,8 +98,7 @@ export const PostList = () => {
                 body: JSON.stringify(
                 {
                     token: token
-                }
-                )
+                })
             });
 
             if (response.ok)
@@ -83,9 +106,9 @@ export const PostList = () => {
                 localStorage.setItem('postID', post._id);
                 router.push(`/post/${post._id}`);
             }
-            else 
+            else if (response.status == 404)
             {
-                router.push('/login')
+                setInvalidToken(true);
             }
         }
         catch (error)
@@ -135,16 +158,41 @@ export const PostList = () => {
     <div>
       {posts.map((post) => (
         <div key = {post._id} className = "mb-8 text-fourth">
-            <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl">
-            <div>Created By {post.author} <span className = "ml-20">Posted On: {post.posted} </span></div>
-            <div className = "text-4xl">{post.title}<span className = "ml-10 text-3xl text-fourth inline-block bg-primary px-2 rounded-full">{post.tag}</span></div>
-            <div className = "text-lg">{post.content}</div>
+            <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }}
+            className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl">
+            <div className = "flex justify-between">
+                Created By {post.author} 
+                <div>
+                    Posted On: {post.posted}
+                </div>
+            </div>
+            <div className = "text-4xl">
+                {post.title}
+                <span className = "ml-10 text-3xl text-fourth inline-block bg-primary px-2 py-1 rounded-full">
+                    {post.tag}
+                </span>
+            </div>
+            <div className = "text-lg">
+                {post.content}
+            </div>
             <div className = "flex justify-center">
                 <button type = "button"className = "px-4 py-2 ml-4 bg-fourth text-primary text-xl rounded-full" onClick = {() => pushToPostPage(post)}>Read More</button>
             </div>
             </form>
         </div>
       ))}
+
+        <Modal
+            isOpen = {invalidToken}
+            onRequestClose = {() => setInvalidToken(false)}
+            className = "text-fourth flex justify-center max-w-3xl w-full"
+            overlayClassName = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        >
+            <div style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)', }}
+            className="border-4 border-fourth py-10 px-2 h-64 space-y-4 rounded-3xl w-3/4 flex justify-center items-center">
+                <div className = "text-3xl mx-3">You must first login before you are able to enter the posts!</div>
+            </div>
+        </Modal>
     </div>
   );
 };

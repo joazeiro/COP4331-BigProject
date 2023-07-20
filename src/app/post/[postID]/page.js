@@ -1,19 +1,13 @@
-'use client'
+import { SearchHandler } from '@/components/SearchContext'
+import PostListContainer from '@/components/PostListContainer'
+import PostPage from '@/components/PostPage'
+import FormTitle from '@/components/FormTitle'
 
-import { useEffect, useState } from 'react';
-
-const page = () => 
-{
-    const [postID, setPostID] = useState('');
-    useEffect(() => 
-    {
-        const storedID = localStorage.getItem('postID');
-        setPostID(storedID);
-
-    })
-    return (
-        <div className = "text-5xl text-center">{postID}</div>
-    )
+export default function Home() {
+  return (
+      <PostListContainer>
+        <FormTitle/>
+        <PostPage/>
+      </PostListContainer>
+  )
 }
-
-export default page

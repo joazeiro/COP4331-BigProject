@@ -66,7 +66,7 @@ const LoginForm = () => {
             <div className = "text-center text-fourth text-5xl">Login</div>
                 <div className="rounded-md shadow-sm -space-y-px">
                     <div>
-                        <label htmlFor="email-address" className="text-fourth text-xl">User Name</label>
+                        <label className="text-fourth text-xl">User Name</label>
                         <input 
                             id="username" 
                             name="username" 
@@ -78,7 +78,7 @@ const LoginForm = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="password" className="text-fourth mt-2 block text-xl">Password</label>
+                        <label className="text-fourth mt-2 block text-xl">Password</label>
                         <input 
                             id="password" 
                             name="password" 
