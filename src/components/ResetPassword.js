@@ -67,33 +67,33 @@ const ForgotPassword = () => {
             <div className = "text-center text-fourth text-5xl ">Forgot Password</div>
                 <div className="rounded-md shadow-sm -space-y-px">
                     <div>
-                        <label htmlFor="newPassword" className="text-fourth mt-6 block text-xl">New Password</label>
+                        <label className="text-fourth mt-6 block text-xl">New Password</label>
                         <input 
-                            id="newPassword" 
-                            name="newPassword" 
-                            type="password" 
+                            id = "newPassword" 
+                            name = "newPassword" 
+                            type = "password" 
                             required
-                            className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={newPassword}
-                            onChange={e => setNewPassword(e.target.value)}
+                            className = "appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            value = {newPassword}
+                            onChange = {e => setNewPassword(e.target.value)}
                         />
                     </div>
                     <div>
-                        <label htmlFor="confirmNewPassword" className="text-fourth mt-6 block text-xl">Confirm New Password</label>
+                        <label className="text-fourth mt-6 block text-xl">Confirm New Password</label>
                         <input 
-                            id="confirmNewPassword" 
-                            name="confirmNewPassword" 
-                            type="password" 
+                            id = "confirmNewPassword" 
+                            name = "confirmNewPassword" 
+                            type = "password" 
                             required
-                            className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                            value={confirmNewPassword}
-                            onChange={e => setConfirmNewPassword(e.target.value)}
+                            className = "appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            value = {confirmNewPassword}
+                            onChange = {e => setConfirmNewPassword(e.target.value)}
                         />
                     </div>
                 </div>
                 <div>
-                    <button type="submit"
-                            className="group relative w-full flex justify-center mt-8 py-2 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-fourth hover:bg-third focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type = "submit"
+                            className = "relative w-full flex justify-center mt-8 py-2 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-fourth hover:bg-third focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Make New Password
                     </button>
                 </div>

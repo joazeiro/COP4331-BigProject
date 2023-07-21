@@ -168,7 +168,7 @@ export const PostList = () => {
             </div>
             <div className = "text-4xl">
                 {post.title}
-                <span className = "ml-10 text-3xl text-fourth inline-block bg-primary px-2 py-1 rounded-full">
+                <span className = "ml-10 text-3xl text-fourth inline-block bg-primary px-3 py-2 rounded-full">
                     {post.tag}
                 </span>
             </div>
