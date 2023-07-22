@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ResponseCookies } from 'next/dist/compiled/@edge-runtime/cookies';
 
 const RegisterForm = () => {
     const router = useRouter();
@@ -19,6 +20,7 @@ const RegisterForm = () => {
         if (confirmPassword !== password)
         {
             console.log("Passwords Do Not Match")
+            return;
         }
 
         try 
@@ -49,8 +51,15 @@ const RegisterForm = () => {
             else if (response.status === 401) 
             {
                 // An error has occured
+                const data = await response.json();
                 setErrorMessage(data.message);
             } 
+
+            else if (response.status === 404)
+            {
+                const data = await response.json();
+                setErrorMessage(data.message);
+            }
           } 
           catch (error) 
           {

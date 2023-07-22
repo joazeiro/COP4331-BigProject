@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation';
+import { data } from 'autoprefixer';
 
 const ForgotPassword = () => {
     const [newPassword, setNewPassword] = useState('')
@@ -40,6 +41,7 @@ const ForgotPassword = () => {
 
                 if (response.ok)
                 {
+                    const data = await response.json();
                     setErrorMessage(data.message);
                     await new Promise((resolve) => setTimeout(resolve, 2000));
                     router.push('/login');
@@ -47,6 +49,13 @@ const ForgotPassword = () => {
 
                 else if (response.status === 401)
                 {
+                    const data = await response.json();
+                    setErrorMessage(data.error);
+                }
+                
+                else if (response.status === 404)
+                {
+                    const data = await response.json();
                     setErrorMessage(data.error);
                 }
 
