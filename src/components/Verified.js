@@ -5,35 +5,36 @@ import { useRouter } from 'next/navigation'
 
 const Verified = () => 
 {
-  const apiUrl = process.env.API_URL;
-  const router = useRouter()
-  const UrlParams = useSearchParams();
-  const token = UrlParams.get('token');
+    const apiUrl = process.env.API_URL;
+    const router = useRouter()
+    const UrlParams = useSearchParams();
+    const token = UrlParams.get('token');
 
-  const handleVerify = async () => 
-  {
-    // Makes a stall before it transfer you to the next page ('/login')
-    await new Promise((resolve) => setTimeout(resolve, 5000)); 
-      const response = await fetch(apiUrl + '/verify/' + token,
-      {
-          method: 'GET',
-          headers: 
-          {
-              'Content-Type': 'application/json'
-          },
-      });
+const handleVerify = async () => 
+{
+        // Makes a stall before it transfer you to the next page ('/login')
+        await new Promise((resolve) => setTimeout(resolve, 5000)); 
+
+        const response = await fetch(apiUrl + '/verify/' + token,
+        {
+            method: 'GET',
+            headers: 
+            {
+                'Content-Type': 'application/json'
+            },
+        });
 
       if (response.ok)
       {
-        router.push('/login')
+          router.push('/login')
       }
-  }
+}
 
   useEffect(() =>
   {
     if (token)
     {
-      handleVerify();
+        handleVerify();
     }
 
   }, [router, token, apiUrl]);

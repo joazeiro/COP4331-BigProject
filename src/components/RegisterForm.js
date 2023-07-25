@@ -72,6 +72,7 @@ const RegisterForm = () => {
         <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl" onSubmit={handleRegister}>
             <div className = "text-center text-fourth text-5xl ">Sign Up</div>
             <div className = "rounded-md shadow-sm -space-y-px text-fourth text-xl">
+                { /* First Name Field */ }
                 <div>
                     <label>First Name</label>
                     <input 
@@ -84,6 +85,7 @@ const RegisterForm = () => {
                         onChange = {e => setFirstName(e.target.value)}
                     />
                 </div>
+                { /* Last Name Field */ }
                 <div>
                     <label className = "mt-2 block">Last Name</label>
                     <input 
@@ -96,6 +98,7 @@ const RegisterForm = () => {
                         onChange = {e => setLastName(e.target.value)}
                     />
                 </div>
+                { /* User name Field */ }
                 <div>
                     <label className = "mt-2 block">User Name</label>
                     <input 
@@ -107,7 +110,8 @@ const RegisterForm = () => {
                         value = {username}
                         onChange = {e => setUsername(e.target.value)}
                     />
-                </div>                   
+                </div>          
+                { /* Email Field */ }         
                 <div>
                     <label className = "mt-2 block">Email address</label>
                     <input 
@@ -120,6 +124,7 @@ const RegisterForm = () => {
                         onChange = {e => setEmail(e.target.value)}
                     />
                 </div>   
+                { /* Password Field */ }
                 <div>
                     <label className = "mt-2 block">Password</label>
                     <input 
@@ -132,6 +137,7 @@ const RegisterForm = () => {
                         onChange = {e => setPassword(e.target.value)}
                     />
                 </div>
+                { /* Confirm Password Field */ }
                 <div>
                     <label className = "mt-2 block">Confirm Password</label>
                     <input 
@@ -145,6 +151,7 @@ const RegisterForm = () => {
                     />
                 </div>
             </div>
+            { /* Register Button */ }
             <div>
                 <button type = "submit"
                         className = "relative w-full flex justify-center py-2 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-fourth hover:bg-third focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -154,11 +161,13 @@ const RegisterForm = () => {
             <div className = "flex items-center justify-center">
                 <div className = "text-md text-center text-black">Already have an account?</div>
             </div>
+            { /* Login Link */ }
             <div className = "flex items-center justify-center">
                     <Link href="/login" className="font-medium text-fourth hover:text-black">
                         Login Here!
                     </Link>
             </div>
+            { /* Error Message Display */ }
             <div className = "flex items-center justify-center">
                 <div className = "text-md text-center text-black">{errorMessage}</div>
             </div>

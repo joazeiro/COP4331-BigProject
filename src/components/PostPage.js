@@ -18,6 +18,7 @@ const PostPage = () =>
 
     useEffect(() => 
     {
+        // It will retrieve the postID and token once the page has been loaded
         if (typeof window !== 'undefined') 
         {
             setPostID(localStorage.getItem('postID'));
@@ -27,6 +28,7 @@ const PostPage = () =>
 
     useEffect(() =>
     {
+        // For the pop up when you have an invalid token for being inactive for too long
         let timer
         if (invalidToken)
         {
@@ -78,6 +80,8 @@ const PostPage = () =>
                 const data = await response.json();
                 localStorage.setItem('personalToken', data.token);
                 closeCommentPopup();
+
+                // Clears the comment field
                 setComment('');
                 fetchDetails();
             }
@@ -135,6 +139,9 @@ const PostPage = () =>
 
     useEffect(() => 
     {
+        // If all these are true, it will load.
+        // With this, it prevent a triple flash effect that occurs when
+        // Any one of the variables in the use effect change
         if (postID && token && loading)
         {
             fetchDetails();
@@ -142,7 +149,7 @@ const PostPage = () =>
         
     }, [apiUrl, token, postID, loading]);
 
-    if (loading || !post) 
+    if (loading) 
     {
         return (
             <div className = "flex items-center justify-center">
@@ -159,6 +166,7 @@ const PostPage = () =>
                 <div key = {post._id} className = "mb-8 text-fourth">
                     <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)', }}
                     className = "border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl">
+                        { /* The Post Field */ }
                         <div className = "flex justify-between">
                             Created By {post.author} <span className = "ml-20">Posted On: {post.posted}</span>
                         </div>
@@ -177,6 +185,7 @@ const PostPage = () =>
                         </div>
                     </form>
 
+                    { /* Modal Field for adding comments */ }
                     <Modal
                         isOpen = {commentPopup}
                         onRequestClose = {closeCommentPopup}
@@ -211,6 +220,7 @@ const PostPage = () =>
                         </div>
                         </Modal>
 
+                    { /* Modal for invalid token */ }
                     <Modal
                         isOpen = {invalidToken}
                         onRequestClose = {() => setInvalidToken(false)}
@@ -228,6 +238,7 @@ const PostPage = () =>
                     </div>
                         {post.comments && post.comments.length > 0 ? (
                             <div>
+                                { /* Comments Field and it's display */ }
                                 {post.comments.map((comment, index) => (
                                     <form key = {index} style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)', }}
                                     className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl mt-8">

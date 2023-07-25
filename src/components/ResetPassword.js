@@ -16,65 +16,66 @@ const ForgotPassword = () => {
 
     const handleEmail = async (e) => 
     {
-            e.preventDefault()
+        e.preventDefault()
 
-            if (newPassword !== confirmNewPassword)
-            {
-                setErrorMessage("Passwords Must Match");
-            }
+        if (newPassword !== confirmNewPassword)
+        {
+            setErrorMessage("Passwords Must Match");
+        }
 
-            try
-            {
-                const response = await fetch(apiUrl + '/reset-password/' + token,
-                { 
-                    method: 'POST',
-                    headers:
+        try
+        {
+            const response = await fetch(apiUrl + '/reset-password/' + token,
+            { 
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
                     {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(
-                        {
-                            password: newPassword
-                        }
-                    )
-                });
+                        password: newPassword
+                    }
+                )
+            });
 
-                if (response.ok)
-                {
-                    const data = await response.json();
-                    setErrorMessage(data.message);
-                    await new Promise((resolve) => setTimeout(resolve, 2000));
-                    router.push('/login');
-                }
-
-                else if (response.status === 401)
-                {
-                    const data = await response.json();
-                    setErrorMessage(data.error);
-                }
-                
-                else if (response.status === 404)
-                {
-                    const data = await response.json();
-                    setErrorMessage(data.error);
-                }
-
-                else 
-                {
-                    console.log('An Error Occurred');
-                }
-            }
-
-            catch (error)
+            if (response.ok)
             {
-                console.log('An Error Occurred', error);
+                const data = await response.json();
+                setErrorMessage(data.message);
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                router.push('/login');
             }
+
+            else if (response.status === 401)
+            {
+                const data = await response.json();
+                setErrorMessage(data.error);
+            }
+            
+            else if (response.status === 404)
+            {
+                const data = await response.json();
+                setErrorMessage(data.error);
+            }
+
+            else 
+            {
+                console.log('An Error Occurred');
+            }
+        }
+
+        catch (error)
+        {
+            console.log('An Error Occurred', error);
+        }
     }
   return (
     <div>
         <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }} className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl" onSubmit={handleEmail}>            
             <div className = "text-center text-fourth text-5xl ">Forgot Password</div>
                 <div className="rounded-md shadow-sm -space-y-px">
+                    { /* New Password Field */ }
                     <div>
                         <label className="text-fourth mt-6 block text-xl">New Password</label>
                         <input 
@@ -87,6 +88,7 @@ const ForgotPassword = () => {
                             onChange = {e => setNewPassword(e.target.value)}
                         />
                     </div>
+                    { /* New Password Confirm Field */ }
                     <div>
                         <label className="text-fourth mt-6 block text-xl">Confirm New Password</label>
                         <input 
@@ -100,12 +102,14 @@ const ForgotPassword = () => {
                         />
                     </div>
                 </div>
+                { /* Button Field */ }
                 <div>
                     <button type = "submit"
                             className = "relative w-full flex justify-center mt-8 py-2 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-fourth hover:bg-third focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Make New Password
                     </button>
                 </div>
+                { /* Error Message Field */ }
                 <div className = "flex items-center justify-center">
                     {errorMessage}
                 </div>

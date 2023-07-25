@@ -7,64 +7,67 @@ import { SearchContext } from './SearchContext';
 const Navbar = () => {
     const router = useRouter();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    // This is to share the variable of searchQuery for the search bar in the nav and 
+    // Displaying beneath it in the PostList.js component
     const { searchQuery, setSearchQuery } = useContext(SearchContext);
     const apiUrl = process.env.API_URL;
 
-    useEffect(() => 
+    const checkLoginStatus = async () => 
     {
-        const checkLoginStatus = async () => 
+        let token = null;
+        
+        // Retrives token is the window has been loaded
+        if (typeof window !== 'undefined')
         {
-            let token = null;
+            token = localStorage.getItem('personalToken');
+        }
 
-            if (typeof window !== 'undefined')
+        try
+        {
+            if (!token)
             {
-                token = localStorage.getItem('personalToken');
+                setIsLoggedIn(false);
+                return;
             }
 
-            try
+            const response = await fetch(apiUrl + '/',
             {
-                if (!token)
+                method: 'POST',
+                headers:
                 {
-                    setIsLoggedIn(false);
-                    return;
-                }
-
-                const response = await fetch(apiUrl + '/',
-                {
-                    method: 'POST',
-                    headers:
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
                     {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(
-                        {
-                            token: token
-                        }
-                    )
-                });
+                        token: token
+                    }
+                )
+            });
 
-                if (response.ok)
-                {
-                    setIsLoggedIn(true);
-                }
-                else 
-                {
-                    setIsLoggedIn(false);
-                }
+            if (response.ok)
+            {
+                setIsLoggedIn(true);
             }
-            
-            catch
+            else 
             {
                 setIsLoggedIn(false);
             }
-        };
-
+        }
+        
+        catch
+        {
+            setIsLoggedIn(false);
+        }
+    };
+    
+    useEffect(() => 
+    {
         checkLoginStatus();
-
     }, []);
 
     const handleSearch = (e) =>
     {
+        // Setting the Search Query
         setSearchQuery(e.target.value);
     }
 
@@ -97,6 +100,7 @@ const Navbar = () => {
     return (
         <nav className="flex justify-between w-full py-3 px-4" style = {{ background: 'linear-gradient(180deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }}>
             <div className = "text-4xl text-fourth">GeoBook</div>
+            {/* Search Bar */ }
                 <ul className = "flex justify-between">
                     <li>
                         <input
@@ -109,6 +113,7 @@ const Navbar = () => {
                     </li>
                 </ul>
                 <ul className = "flex justify-between">
+                    { /* All the Buttons for the Navbar */ }
                     {!isLoggedIn ? (
                         <>
                             <li>

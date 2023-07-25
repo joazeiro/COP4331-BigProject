@@ -15,6 +15,8 @@ const CreatePost = () =>
 
     useEffect(() => 
     {
+        // This is used for the tag to make sure the country that is inputted is a valid country
+        // So the user can put random stuff in the tag field
         fetch('https://restcountries.com/v3.1/all').then(response => response.json())
             .then(data => 
             {
@@ -36,7 +38,8 @@ const CreatePost = () =>
     {
         e.preventDefault();
         const token = localStorage.getItem('personalToken');
-        
+
+        // Adds the country to the database so it can be displayed in the main page        
         if (validateCountry(tag))
         {
             try
@@ -90,6 +93,7 @@ const CreatePost = () =>
                     <div className = "text-center flex-center text-fourth text-xl py-2">Here, you can do whatever your heart desires! You can ask
                     questions, discuss your favorite memories, or recommend to other people the cool things you have seen in your trip!</div>
                 </div>
+                { /* Title Field */}
                 <div className = "px-10">
                     <label className="text-fourth text-xl">Title</label>
                         <input 
@@ -102,6 +106,7 @@ const CreatePost = () =>
                             onChange={e => setTitle(e.target.value)}
                         />
                 </div>
+                { /* Tag Field */}
                 <div className = "px-10">
                     <label className = "text-fourth text-xl flex">Tag</label>
                     <div className = "text-fourth mt-2 flex">This is where you would put your country of topic</div>
@@ -115,9 +120,11 @@ const CreatePost = () =>
                         onChange={e => setTag(e.target.value)}
                     />
                 </div>
+                { /* Tag Error Display */ }
                 <div className = "flex items-center justify-center">
                     <div className = "text-lg text-center text-black">{errorCountry}</div>
                 </div>
+                { /* Content Field */ }
                 <div className = "px-10">
                     <label className = "text-fourth text-xl">Content</label>
                     <textarea
@@ -129,12 +136,14 @@ const CreatePost = () =>
                         onChange = {e => setContent(e.target.value)}
                     />
                 </div>
+                {/* Button */ }
                 <div className = "px-32">
                     <button type="Submit"
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-lg font-medium rounded-md text-white bg-fourth hover:bg-third focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Create Post
                     </button>
                 </div>
+                { /* Error Message */}
                 <div className = "flex items-center justify-center">
                     <div className = "text-lg text-center text-black">{errorMessage}</div>
                 </div>

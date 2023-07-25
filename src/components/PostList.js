@@ -7,6 +7,7 @@ import Modal from 'react-modal';
 
 export const PostList = () => {
     const router = useRouter();
+    // To obtain the searchQuery from the Navbar
     const { searchQuery } = useContext(SearchContext);
     const [posts, setPosts] = useState([]);
     const [invalidToken, setInvalidToken] = useState(false);
@@ -16,15 +17,16 @@ export const PostList = () => {
     
     useEffect(() =>
     {
+        // Retrives token if loaded
         if (typeof window !== 'undefined') 
         {
-            // Check if running on the client-side
             setToken(localStorage.getItem('personalToken'));
         }
     }, []);
 
     useEffect(() =>
     {
+        // Pushes user to login if they try to access post but they haven't logged in
         let timer
         if (invalidToken)
         {
@@ -40,7 +42,6 @@ export const PostList = () => {
 
     const fetchPosts = async () => 
     {
-        console.log(searchQuery);
         try 
         {
             const response = await fetch(apiUrl + '/search', 
@@ -52,22 +53,21 @@ export const PostList = () => {
                 },
                 body: JSON.stringify(
                 {
-                    token: token,
-                    tag: searchQuery,
+                    tag: searchQuery
                 }),
-        });
+            });
 
-        if (response.ok) 
-        {
-            const data = await response.json();
-            setLoading(false);
-            setPosts(data.results);
-        } 
-        else if (response.status === 404) 
-        {
-            const data = await response.json();
-            console.log(data.Error);
-        }
+            if (response.ok) 
+            {
+                const data = await response.json();
+                setLoading(false);
+                setPosts(data.results);
+            } 
+            else if (response.status === 404) 
+            {
+                const data = await response.json();
+                console.log(data.Error);
+            }
         } 
         catch (error) 
         {
@@ -80,6 +80,7 @@ export const PostList = () => {
         const personalToken = localStorage.getItem('personalToken');
         console.log(personalToken);
 
+        // Trying to account for every case for invalid token (might be excessive but it works)
         if (personalToken === '' || personalToken === 'null' || !personalToken || personalToken === null)
         {
             setInvalidToken(true);
@@ -156,32 +157,37 @@ export const PostList = () => {
 
   return (
     <div>
-      {posts.map((post) => (
-        <div key = {post._id} className = "mb-8 text-fourth">
-            <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }}
-            className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl">
-            <div className = "flex justify-between">
-                Created By {post.author} 
-                <div>
-                    Posted On: {post.posted}
+    { /* Mapping the array of posts retrived by API */ }
+        {posts.map((post) => (
+            <div key = {post._id} className = "mb-8 text-fourth">
+                <form style = {{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }}
+                className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl">
+                    { /* Author and Posted Date Field */ }
+                <div className = "flex justify-between">
+                    Created By {post.author} 
+                    <div>
+                        Posted On: {post.posted}
+                    </div>
                 </div>
+                { /* Title and Tag Field */ }
+                <div className = "text-4xl">
+                    {post.title}
+                    <span className = "ml-10 text-3xl text-fourth inline-block bg-primary px-3 py-2 rounded-full">
+                        {post.tag}
+                    </span>
+                </div>
+                { /* Content Field */ }
+                <div className = "text-lg">
+                    {post.content}
+                </div>
+                <div className = "flex justify-center">
+                    <button type = "button"className = "px-4 py-2 ml-4 bg-fourth text-primary text-xl rounded-full" onClick = {() => pushToPostPage(post)}>Read More</button>
+                </div>
+                </form>
             </div>
-            <div className = "text-4xl">
-                {post.title}
-                <span className = "ml-10 text-3xl text-fourth inline-block bg-primary px-3 py-2 rounded-full">
-                    {post.tag}
-                </span>
-            </div>
-            <div className = "text-lg">
-                {post.content}
-            </div>
-            <div className = "flex justify-center">
-                <button type = "button"className = "px-4 py-2 ml-4 bg-fourth text-primary text-xl rounded-full" onClick = {() => pushToPostPage(post)}>Read More</button>
-            </div>
-            </form>
-        </div>
       ))}
 
+        { /* Modal for User not being Logged In */ }
         <Modal
             isOpen = {invalidToken}
             onRequestClose = {() => setInvalidToken(false)}
