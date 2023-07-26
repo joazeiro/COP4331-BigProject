@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import jwtDecode from 'jwt-decode';
+import Image from 'next/image';
 
 const Account = () => 
 {
@@ -176,7 +177,10 @@ const Account = () =>
             )}
             {Email && (
                 <div style={{ marginTop: '50px' }} className="text-center text-fourth text-xl">
+                    <div className="flex justify-center items-center">
+                    <Image src="/email.png " alt="Email Icon"  width={24} height={24} className="mr-2" />
                     {`${Email}`}
+                    </div>
                 </div>
             )}
             <div style={{ marginTop: '50px' }} className="flex justify-center">
