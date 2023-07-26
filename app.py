@@ -1,18 +1,19 @@
 from flask import Flask, request, jsonify, url_for
 from bson import ObjectId
 from flask_bcrypt import Bcrypt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from random import choice
 from string import ascii_letters, digits
 from jwt.exceptions import ExpiredSignatureError
-from pymongo import MongoClient
+from pymongo import MongoClient, DESCENDING
 from flask_cors import CORS
 from jwt.exceptions import ExpiredSignatureError
 import time
 import jwt,uuid
 import json
+import re
 
 # Internal imports
 import connect
@@ -51,19 +52,26 @@ def createJwtToken(username, secret):
 
     if user:
         new_token = jwt.encode({'id': str(user.get('_id')),'username': username,'first': user.get('first_name'),
-                                'last': user.get('last_name'),'exp': datetime.utcnow() + timedelta(minutes=30)},
+                                'last': user.get('last_name'),'email': user.get('email'),'exp': datetime.utcnow() + timedelta(minutes=30)},
                                 key=secret,algorithm='HS256')
         return new_token
 
+@app.route('/', methods=['POST'])
+def checkJWT():
+    jwt_token = request.json.get("token")
+    decoded_token = None
 
-@app.route('/', methods=['OPTIONS'])
-def handle_preflight():
-    response_headers = {
-        'Access-Control-Allow-Origin': 'https://geobook-social-b4388792f0c1.herokuapp.com',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    }
-    return '', 200, response_headers
+    if jwt_token == None:
+        return jsonify({"Error": "Invalid JWT token. Please log in again"}), 404
+    try:
+        decoded_token = jwt.decode(jwt_token, app.config['SECRET_KEY'], algorithms=['HS256'])
+    except jwt.exceptions.ExpiredSignatureError:
+        return jsonify({"Error": "Invalid JWT token. Please log in again"}), 404
+
+    if decoded_token is None:
+        return jsonify({"Error": "Invalid JWT token. Please log in again"}), 404
+    else:
+        return jsonify({"Message":"Valid JWT"}), 200
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -81,21 +89,18 @@ def login():
                 if user['verified'] == True:
                     # Generate JWT token
                     token = jwt.encode({'id': str(user.get('_id')),'username': username,'first': user.get('first_name'),
-                                    'last': user.get('last_name'), 'exp': datetime.utcnow() + timedelta(minutes=30)},
-                                      app.config['SECRET_KEY'], algorithm='HS256')
+                        'last': user.get('last_name'),'email': user.get('email'),'exp': datetime.utcnow() + timedelta(minutes=30)},
+                        key=app.config['SECRET_KEY'],algorithm='HS256')
 
                     return jsonify({'token': token}),200
                 else:
                     return jsonify({'message':'Email Not Verified!'}), 401
             else:
                 return jsonify({'message': 'Invalid password'}), 401
-
         else:
             return jsonify({'message': 'User not found'}), 401
-
     else:
         return jsonify({'message': 'Username and Password are required'}), 401
-
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -111,6 +116,11 @@ def signup():
     if users.find_one({'email': email}):
         return jsonify({'message': 'Email is already in use, please log in'})
 
+    # Password regex check
+    password_regex = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+    if not re.match(password_regex, password):
+        return jsonify({'message': 'Password must be at least 8 characters long and contain at least one letter, one digit, and one special character (@ $ ! % * # ? &).'}), 404
+
     # Otherwise, create a new instance of a user
     else:
 
@@ -125,7 +135,6 @@ def signup():
         msg.body = f"Thank you for registering. Please click the link to verify your email: {verification_link}"
         mail.send(msg)
 
-
         # Make all the information received onto one JSON file
         password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
         new_user = {
@@ -136,13 +145,14 @@ def signup():
             'username': username,
             'verified': False,
             'reset_token': "",
-            'verify_token': token
+            'verify_token': token,
+            'visited_countries':[]
         }
 
         # Insert the user
         users.insert_one(new_user)
 
-        return jsonify({'message': 'You were successfully registered! Check your email for the email verification.'}),200
+        return jsonify({'message': 'You were successfully registered! Check your email for the email verification.'}), 200
 
 @app.route("/forgot-password", methods=["POST"])
 def forgot_password():
@@ -164,23 +174,26 @@ def forgot_password():
     users.update_one({"_id": user["_id"]}, {"$set": {"reset_token": token}})
 
     # Send the password reset instructions to the user's email
-    pwd_reset_link = f'https://www.geobook-social.dev/reset-password'
+    pwd_reset_link = f'https://www.geobook-social.dev/reset-password?token={token}'
 
     msg = Message("Password Reset Email", recipients=[email])
-    msg.body = f"You have requested a password reset. Your reset token is {token}. Please go to the following link to finalize this process {pwd_reset_link}"
+    msg.body = f"You have requested a password reset. Please go to the following link to finalize this process {pwd_reset_link}"
     mail.send(msg)
 
-    return jsonify({"message": "Password reset instructions sent to you email"}),200
+    return jsonify({"message": "Password reset instructions sent to your email"}),200
     
-
-@app.route("/reset-password", methods=["POST"])
-def reset_password():
+@app.route("/reset-password/<token>", methods=["POST"])
+def reset_password(token):
     users = connect.access_user_collection()
-    token = request.json.get("token")
     new_password = request.json.get("password")
 
     if not token or not new_password:
-        return jsonify({"error": "Token and new password are required"}), 401
+        return jsonify({"error": "New password is required"}), 401
+
+    # Password regex check
+    password_regex = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+    if not re.match(password_regex, new_password):
+        return jsonify({'error': 'Password must be at least 8 characters long and contain at least one letter, one digit, and one special character (@ $ ! % * # ? &).'}), 404
 
     user = users.find_one({"reset_token": token})
 
@@ -196,8 +209,7 @@ def reset_password():
         {"$set": {"password": hashed_password}, "$unset": {"reset_token": ""}}
     )
 
-    return jsonify({"message": "Password updated successfully"}),200
-
+    return jsonify({"message": "Password updated successfully"}), 200
 
 @app.route('/verify/<token>', methods=['GET'])
 def verify_email(token):
@@ -211,7 +223,8 @@ def verify_email(token):
     
     users.update_one(
         {"email": user["email"]},
-        {"$set": {"verified": True}})
+        {"$set": {"verified": True}, "$unset": {"verify_token": ""}}
+    )
     
     return jsonify({'message': 'Email verified successfully.'}),200
 
@@ -220,6 +233,9 @@ def new_post():
     title = request.json.get("title")
     content = request.json.get("body")
     tag = request.json.get("tag")
+
+    eastern_tz = timezone(timedelta(hours=-4))
+    posted = datetime.now().astimezone(eastern_tz).strftime("%m-%d-%Y %I:%M:%S %p")
 
     jwt_token = request.json.get("token")
     decoded_token = None
@@ -237,14 +253,13 @@ def new_post():
 
     posts = connect.access_post_collection()
 
-    new_post = {'author': author, 'title': title, 'content': content, 'tag': tag, 'comments': []}
+    new_post = {'author': author, 'title': title, 'content': content, 'tag': tag, 'posted': posted, 'comments': []}
 
     posts.insert_one(new_post)
 
     post = posts.find_one({'content': content})
 
     return jsonify({'message': "Post Added.", 'token': newJWT}), 200
-
 
 @app.route('/edit-post', methods=['POST'])
 def edit_post():
@@ -276,11 +291,10 @@ def edit_post():
 
 @app.route('/new-comment',methods = ['POST'])
 def new_comment():
-    
     id = request.json.get("id")
     content = request.json.get("body") 
-    posted = datetime.now().strftime("%d-%m-%Y")
-
+    eastern_tz = timezone(timedelta(hours=-4))
+    posted = datetime.now().astimezone(eastern_tz).strftime("%m-%d-%Y %I:%M:%S %p")
     jwt_token = request.json.get("token")
     decoded_token = None
 
@@ -306,13 +320,8 @@ def new_comment():
 
     return jsonify({"message":"Comment Added.","token":newJWT}),200
 
-@app.route('/search', methods=['GET'])
-def search_posts():
-    data = request.get_json()
-    query = data.get('tag')
-    page = int(data.get('page', 1))
-    per_page = int(data.get('per_page', 10))
-
+@app.route('/profile-info', methods = ['GET'])
+def profile_info():
     jwt_token = request.json.get("token")
     decoded_token = None
 
@@ -324,13 +333,63 @@ def search_posts():
     if decoded_token is None:
         return jsonify({"Error": "Invalid JWT token. Please log in again"}), 404
 
-    author = decoded_token.get('username')  # Use .get() method to handle None value
-    newJWT = createJwtToken(author, app.config['SECRET_KEY'])
+    username = decoded_token.get('username')  # Use .get() method to handle None value
+    newJWT = createJwtToken(username, app.config['SECRET_KEY'])
+
+    users = connect.access_user_collection()
+    user = users.find_one({"username": username})
+
+    user['_id'] = str(user['_id'])
+    response = {
+        'Username' : user['username'],
+        'First Name':user['first_name'],
+        "Last Name":user['last_name'],
+        "Email":user['email'],
+        'token': newJWT
+    }
+
+    json_response = json.dumps(response,cls = CustomJSONEncoder)
+
+    return json_response, 200, {'Content-Type': 'application/json'}
+
+@app.route('/add-country', methods = ['POST'])
+def add_country():
+    new_country = request.json.get("country")
+    jwt_token = request.json.get("token")
+    decoded_token = None
+
+    try:
+        decoded_token = jwt.decode(jwt_token, app.config['SECRET_KEY'], algorithms=['HS256'])
+    except jwt.exceptions.ExpiredSignatureError:
+        return jsonify({"Error": "Invalid JWT token. Please log in again"}), 404
+
+    if decoded_token is None:
+        return jsonify({"Error": "Invalid JWT token. Please log in again"}), 404
+
+    username = decoded_token.get('username')  # Use .get() method to handle None value
+    newJWT = createJwtToken(username, app.config['SECRET_KEY'])
+
+    users = connect.access_user_collection()
+    user = users.find_one({"username": username})
+    
+    user['visited_countries'].append(new_country)
+    users.update_one({'username':username}, {'$set':{'visited_countries' : user['visited_countries']}})
+
+    return jsonify({"token": newJWT, "countries": user['visited_countries']})
+
+@app.route('/search', methods=['POST'])
+def search_posts():
+    data = request.get_json()
+    query = data.get('tag')
+    page = int(data.get('page', 1))
+    per_page = int(data.get('per_page', 10))
     
     posts = connect.access_post_collection()
 
-    results = posts.find({'tag': query})
-    total_results = posts.count_documents({'tag': query})
+    regex_pattern = re.compile(f'.*{re.escape(query)}.*', re.IGNORECASE)
+    query_filter = {'tag': regex_pattern}
+    results = posts.find(query_filter).sort("posted",DESCENDING)
+    total_results = posts.count_documents(query_filter)
 
     start_index = (page - 1) * per_page
     end_index = min(start_index + per_page, total_results)
@@ -343,9 +402,7 @@ def search_posts():
         'total_results': total_results,
         'page': page,
         'per_page': per_page,
-        'token': newJWT,
         'results': list(current_page_results)
-        
     }
 
     # Convert the response to JSON using the custom JSONEncoder
@@ -353,8 +410,44 @@ def search_posts():
 
     return json_response, 200, {'Content-Type': 'application/json'}
 
+@app.route('/find-post', methods=['POST'])
+def find_post():
 
-@app.route('/search-user-posts', methods=['GET'])
+    id = request.json.get('id')
+    jwt_token = request.json.get("token")
+    decoded_token = None
+
+    try:
+        decoded_token = jwt.decode(jwt_token, app.config['SECRET_KEY'], algorithms=['HS256'])
+    except jwt.exceptions.ExpiredSignatureError:
+        return jsonify({"Error": "Invalid JWT token. Please log in again"}), 404
+
+    if decoded_token is None:
+        return jsonify({"Error": "Invalid JWT token. Please log in again"}), 404
+
+    newJWT = createJwtToken(decoded_token.get('username'), app.config['SECRET_KEY'])
+
+    posts = connect.access_post_collection()
+
+    post = posts.find_one({"_id": ObjectId(id)})
+
+    # Sort the comments by the "posted" field in descending order
+    comments = post['comments']
+    sorted_comments = sorted(comments, key=lambda x: datetime.strptime(x['posted'], "%m-%d-%Y %I:%M:%S %p"), reverse=True)
+    post['comments'] = sorted_comments
+
+    # Convert the ObjectId to string representation
+    post['_id'] = str(post['_id'])
+    response = {
+        'post' : post,
+        'token': newJWT
+    }
+
+    json_response = json.dumps(response,cls = CustomJSONEncoder)
+
+    return json_response, 200, {'Content-Type': 'application/json'}
+    
+@app.route('/search-user-posts', methods=['POST'])
 def search_user_posts():
     data = request.get_json()
     query = data.get('username')
@@ -399,6 +492,5 @@ def search_user_posts():
 
     return json_response, 200, {'Content-Type': 'application/json'}
 
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
