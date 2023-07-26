@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import jwtDecode from 'jwt-decode';
+import Image from 'next/image';
 
 const Account = () => 
 {
@@ -153,7 +154,10 @@ const Account = () =>
             )}
             {Email && (
                 <div style={{ marginTop: '50px' }} className="text-center text-fourth text-xl">
+                    <div className="flex justify-center items-center">
+                    <Image src="/email.png " alt="Email Icon"  width={24} height={24} className="mr-2" />
                     {`${Email}`}
+                    </div>
                 </div>
             )}
             <div style={{ marginTop: '50px' }} className="flex justify-center">
@@ -170,7 +174,7 @@ const Account = () =>
 
         {isModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" onClick={closeModal}>
-                <div style={{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)',}}
+                <div style= {{ marginTop: '50px', background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)',}}
                     className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl"
                         onClick={(e) => e.stopPropagation()}>
                     <h2 className="text-2xl text-fourth font-bold mb-4">My Adventure Book</h2>
