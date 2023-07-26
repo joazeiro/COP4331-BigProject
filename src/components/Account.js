@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import jwtDecode from 'jwt-decode';
-import Image from 'next/image';
 
 const Account = () => 
 {
@@ -15,6 +14,8 @@ const Account = () =>
 
     const [isModalOpen, setModalOpen] = useState(false);
     const [visitedCountries, setVisitedCountries] = useState([]);
+    const [countries, setCountries] = useState([]);
+    const [errorCountry, setErrorCountry] = useState('');
     const [newCountry, setNewCountry] = useState('');
 
     const apiUrl = process.env.API_URL;
@@ -40,6 +41,21 @@ const Account = () =>
             }
         };
         GetUserInfo();
+        fetchVisitedCountries();
+
+        // This is used for the tag to make sure the country that is inputted is a valid country
+        // So the user can put random stuff in the tag field
+        fetch('https://restcountries.com/v3.1/all').then(response => response.json())
+            .then(data => 
+            {
+                const countryNames = data.map(country => country.name.common);
+                setCountries(countryNames);
+            })
+            .catch(error => 
+            {
+                console.log('An error occurred while fetching country data:', error);
+            });
+
     }, []);
     
     const MyPosts = () =>
@@ -61,7 +77,7 @@ const Account = () =>
         }
         try 
         {
-            const response = await fetch(apiUrl + '/add-country', 
+            const response = await fetch(apiUrl + '/profile-info', 
             {
                 method: 'POST',
                 headers: 
@@ -77,10 +93,11 @@ const Account = () =>
             {
                 const data = await response.json();
                 setVisitedCountries(data.countries);
+                localStorage.setItem('personalToken', data.token);
             } 
             else if (response.status === 404) 
             {
-               
+               console.log('error');
             }
         } 
         catch (error) 
@@ -89,10 +106,9 @@ const Account = () =>
         }
     };
 
-    const MyAdventureBook = () =>
+    function validateCountry(country)
     {
-        openModal();
-        fetchVisitedCountries();
+        return countries.includes(country);
     }
     
     const closeModal = () => 
@@ -112,34 +128,40 @@ const Account = () =>
         {
             return;
         }
-        try 
+        if (validateCountry(newCountry))
         {
-            const response = await fetch(apiUrl + '/add-country', 
+            try 
             {
-                method: 'POST',
-                headers: 
+                const response = await fetch(apiUrl + '/add-country', 
                 {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(
+                    method: 'POST',
+                    headers: 
+                    {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(
+                    {
+                        token: token,
+                        country: newCountry,
+                    }),
+                });
+                if (response.ok) 
                 {
-                    token: token,
-                    country: newCountry,
-                }),
-            });
-            if (response.ok) 
-            {
-                const data = await response.json();
-                setVisitedCountries(data.countries);
-                setNewCountry('');
-            } 
-            else if (response.status === 404) 
-            {
+                    fetchVisitedCountries();
+                    setNewCountry('');
+                } 
+                else if (response.status === 404) 
+                {
 
+                }
+            } catch (error) 
+            {
+                console.error(error);
             }
-        } catch (error) 
+        }
+        else
         {
-            console.error(error);
+            setErrorCountry('Please Input a Valid Country');
         }
     };
 
@@ -154,10 +176,7 @@ const Account = () =>
             )}
             {Email && (
                 <div style={{ marginTop: '50px' }} className="text-center text-fourth text-xl">
-                    <div className="flex justify-center items-center">
-                    <Image src="/email.png " alt="Email Icon"  width={24} height={24} className="mr-2" />
                     {`${Email}`}
-                    </div>
                 </div>
             )}
             <div style={{ marginTop: '50px' }} className="flex justify-center">
@@ -166,21 +185,22 @@ const Account = () =>
                 </button>
             </div>
             <div style={{ marginTop: '25px' }} className="flex justify-center">
-                <button className = "px-4 py-2 bg-fourth text-primary text-xl rounded-full" onClick = {MyAdventureBook}>
+                <button className = "px-4 py-2 bg-fourth text-primary text-xl rounded-full" onClick = {openModal}>
                     My Adventure Book
                 </button>
+            </div>
+            <div className = "flex flex-wrap justify-start">
+                {visitedCountries?.map((country, index) => (
+                    <div key = {index} className = "mb-8 inline-block bg-primary text-fourth rounded-full mx-5 py-4 px-5 text-3xl">{country}</div>
+                ))}
             </div>
             </nav>
 
         {isModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" onClick={closeModal}>
-                <div style= {{ marginTop: '50px', background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)',}}
+                <div style={{ background: 'linear-gradient(125deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)',}}
                     className="border-4 border-fourth py-10 px-4 space-y-4 rounded-3xl"
                         onClick={(e) => e.stopPropagation()}>
-                    <h2 className="text-2xl text-fourth font-bold mb-4">My Adventure Book</h2>
-                    <ul>
-                        {visitedCountries.map((country, index) => (<li key={index}>{country}</li>))}
-                    </ul>
             <div className="flex items-center">
                 <input
                     type="text"
@@ -191,6 +211,9 @@ const Account = () =>
                 <button className="ml-2 px-4 py-2 bg-fourth text-primary text-xl rounded-full" onClick={addCountry} >
                     Add Country
                 </button>
+            </div>
+            <div className = "flex items-center justify-center">
+                    <div className = "text-lg text-center text-black">{errorCountry}</div>
             </div>
             </div>
             </div>

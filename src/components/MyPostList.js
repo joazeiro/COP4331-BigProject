@@ -40,7 +40,7 @@ export const MyPostList = () => {
 
     const fetchPosts = async () => 
     {
-        console.log(searchQuery);
+        let token = localStorage.getItem('personalToken');
         try 
         {
             const response = await fetch(apiUrl + '/search-user-posts', 
@@ -52,22 +52,22 @@ export const MyPostList = () => {
                 },
                 body: JSON.stringify(
                 {
-                    token: token,
-                    tag: searchQuery,
+                    search: searchQuery,
+                    token: token
                 }),
-        });
+            });
 
-        if (response.ok) 
-        {
-            const data = await response.json();
-            setLoading(false);
-            setPosts(data.results);
-        } 
-        else if (response.status === 404) 
-        {
-            const data = await response.json();
-            console.log(data.Error);
-        }
+            if (response.ok) 
+            {
+                const data = await response.json();
+                setLoading(false);
+                setPosts(data.results);
+            } 
+            else if (response.status === 404) 
+            {
+                const data = await response.json();
+                console.log(data.Error);
+            }
         } 
         catch (error) 
         {

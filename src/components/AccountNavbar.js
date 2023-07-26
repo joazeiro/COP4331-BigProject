@@ -39,17 +39,6 @@ const AccountNavbar = () =>
         <nav className="flex justify-between w-full py-3 px-4" style={{ background: 'linear-gradient(180deg, rgba(236,229,199,1) 0%, rgba(205,194,174,1) 50%, rgba(168,157,135,1) 100%)' }}>
             <button className="text-4xl text-fourth" onClick={pushToHomePage}>GeoBook</button>
                 <ul className = "flex justify-between">
-                    <li>
-                        <input
-                            type = "text"
-                            placeholder = "Search"
-                            className = "px-4 py-2 border text-black border-gray-400 rounded-full w-96"
-                            value = {searchQuery}
-                            onChange = {handleSearch}
-                        />
-                    </li>
-                </ul>
-                <ul className = "flex justify-between">
                     {
                         <>
                             <li>
