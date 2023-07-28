@@ -57,6 +57,12 @@ const PostPage = () =>
         e.preventDefault();
         const retrievedPostID = localStorage.getItem('postID');
         const personalToken = localStorage.getItem('personalToken');
+
+        if (comment == '')
+        {
+            return;
+        }
+
         try
         {
             const response = await fetch(apiUrl + '/new-comment',

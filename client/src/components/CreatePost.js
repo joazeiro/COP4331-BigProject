@@ -39,6 +39,11 @@ const CreatePost = () =>
         e.preventDefault();
         const token = localStorage.getItem('personalToken');
 
+        if (content == '')
+        {
+            return;
+        }
+
         // Adds the country to the database so it can be displayed in the main page        
         if (validateCountry(tag))
         {
